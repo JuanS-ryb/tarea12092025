@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/appbar.dart';
 import '../home/home.dart';
 import '../user/form.dart';
+import '../../data/notifiers.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -46,10 +47,42 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  String? _emailValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Por favor ingrese su correo';
+    }
+    // Expresión regular para validar correo
+    final emailRegex = RegExp(
+      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+    );
+    if (!emailRegex.hasMatch(value)) {
+      return 'Ingrese un correo válido';
+    }
+    return null;
+  }
+
+  String? _passwordValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Por favor ingrese su contraseña';
+    }
+    // Regex para validar contraseña: 8-16 caracteres, mayúscula, minúscula, número y símbolo
+    final passwordRegex = RegExp(
+      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,16}$',
+    );
+    if (!passwordRegex.hasMatch(value)) {
+      return 'La contraseña debe tener 8-16 caracteres, al menos una mayúscula, minúscula, número y símbolo';
+    }
+    return null;
+  }
+
   void _login() {
     if (_formKey.currentState!.validate()) {
       final username = _usernameController.text;
       final password = _passwordController.text;
+
+      // Actualizamos los valores directamente
+      mailNotifier.value = username;
+      passwordNotifier.value = password;
 
       Navigator.pushReplacement(
         context,
@@ -82,16 +115,11 @@ class _LoginScreenState extends State<LoginScreen> {
               TextFormField(
                 controller: _usernameController,
                 decoration: const InputDecoration(
-                  labelText: 'Usuario',
-                  prefixIcon: Icon(Icons.person),
+                  labelText: 'Correo',
+                  prefixIcon: Icon(Icons.email),
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese su usuario';
-                  }
-                  return null;
-                },
+                validator: _emailValidator,
               ),
               const SizedBox(height: 20),
               TextFormField(
@@ -102,12 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   border: OutlineInputBorder(),
                 ),
                 obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese su contraseña';
-                  }
-                  return null;
-                },
+                validator: _passwordValidator,
               ),
               const SizedBox(height: 30),
               ElevatedButton(

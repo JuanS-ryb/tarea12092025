@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:login_app/data/notifiers.dart';
 import 'pages/splash/splash_app.dart';
+import 'theme/theme_app.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,13 +12,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ), // ThemeData
-      home: const SplashScreen(),
-      debugShowCheckedModeBanner: false,
-    ); // MaterialApp
+    return ValueListenableBuilder(
+        valueListenable: isUsingDarkTheme,
+        builder: (context, isDark, _) {
+          return MaterialApp(
+            title: 'Flutter Demo App',
+            darkTheme: AppTheme.darkTheme,
+            theme: AppTheme.lightTheme,
+            themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+            home: const SplashScreen(),
+            debugShowCheckedModeBanner: false,
+          );
+        });
   }
 }
